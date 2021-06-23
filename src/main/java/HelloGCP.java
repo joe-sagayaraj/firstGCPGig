@@ -1,6 +1,10 @@
 import com.google.api.gax.paging.Page;
 
 
+import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.BigQueryOptions;
+import com.google.cloud.bigquery.Dataset;
+import com.google.cloud.bigquery.DatasetInfo;
 import com.google.common.collect.Lists;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.Bucket;
@@ -9,13 +13,15 @@ import com.google.cloud.storage.StorageOptions;
 
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class HelloGCP {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Hello GCP");
-        authExplicit("/Users/joeletsdoit/Downloads/joe-try-gcp1-c24ba57b0d02.json");
+        bqExample();
+        //authExplicit("/USERS/joeletsdoit/Downloads/joe-try-gcp1-c24ba57b0d02.json");
     }
 
     static void authExplicit(String jsonPath) throws IOException {
@@ -30,5 +36,20 @@ public class HelloGCP {
         for (Bucket bucket : buckets.iterateAll()) {
             System.out.println(bucket.toString());
         }
+   }
+
+    static void bqExample() throws IOException {
+        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("/USERS/joeletsdoit/Downloads/joe-try-gcp1-c24ba57b0d02.json"))
+                .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
+        BigQuery bq = BigQueryOptions.newBuilder().setCredentials(credentials).build().getService();
+
+        String datasetName = "joefirstbqdataset";
+
+        Dataset data = null;
+        DatasetInfo info = DatasetInfo.newBuilder(datasetName).build();
+
+        data=bq.create(info);
+        System.out.printf("Dataset %s created.%n", data.getDatasetId().getDataset());
+
     }
 }
